@@ -25,4 +25,4 @@
 	+installWordlists()
   
 #### Note:
-***To install a desktop enviroment you must use the following repo `-t kali-rolling` to successfully install kde for example.***
+***To install a desktop environment you must use the following repo -t kali-rolling to successfully install kde for example.***
