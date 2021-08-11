@@ -211,7 +211,6 @@ func installAptPackages() {
 		"medusa",
 		"masscan",
 		"whois",
-		"libjenkins-htmlunit-core-js-java",
 		"autopsy",
 		"hashcat",
 		"kismet",
