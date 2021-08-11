@@ -13,7 +13,7 @@
 	
 4- Clone the repo:
 
-	git clone git@github.com:hxhBrofessor/ghettoHackBox.git
+	git clone https://github.com/hxhBrofessor/ghettoHackBox.git
 	cd ghettoHackBox
 	sudo go run ghettoHackBox.go
 
