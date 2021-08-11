@@ -15,7 +15,7 @@
 
 	git clone https://github.com/hxhBrofessor/ghettoHackBox.git
 	cd ghettoHackBox
-	sudo go run ghettoHackBox.go
+	sudo go run ghettoBox.go
 
 	
   
