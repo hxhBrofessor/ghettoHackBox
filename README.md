@@ -4,12 +4,14 @@
 
 1- `sudo apt install golang -y`
 
-2- update .bashrc with the following:
+2 `sudo apt install git -y`
+
+3- update .bashrc with the following:
 
 	export GOPATH=$HOME/go
 	export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
   
-3- sudo go run ghettoBox.go
+4- sudo go run ghettoBox.go
 ​
 ### Functions:
 	+motd()
