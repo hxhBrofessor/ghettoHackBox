@@ -4,14 +4,21 @@
 
 1- `sudo apt install golang -y`
 
-2 `sudo apt install git -y`
+2- `sudo apt install git -y`
 
 3- update .bashrc with the following:
 
 	export GOPATH=$HOME/go
 	export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+	
+4- Clone the repo:
+
+	git clonegit@github.com:hxhBrofessor/ghettoHackBox.git
+	cd ghettoHackBox
+	sudo go run ghettoHackBox.go
+
+	
   
-4- sudo go run ghettoBox.go
 ​
 ### Functions:
 	+motd()
