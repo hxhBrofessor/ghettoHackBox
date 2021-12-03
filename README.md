@@ -33,5 +33,9 @@
 	+installOtherKaliTools() //If theres a tool you'd like to add go to the function and add it to the list before running the program
 	+installWordlists()
   
-#### Note:
+#### Note1:
 ***To install a desktop environment you must use the following repo -t kali-rolling to successfully install kde for example.***
+
+#### Note2:
+
+***searchsploit file location path is /usr/share/exploitdb/exploits***
