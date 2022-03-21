@@ -43,7 +43,6 @@ var colorReset = "\033[0m"
 var GREEN = "\033[32m"
 var RED = "\033[31m"
 var YELLOW = "\033[33m"
-var NOCOLOR = "\033[m"
 
 func motd() {
 	asciiArt :=
@@ -80,9 +79,9 @@ func checkIfRoot() string {
 		log.Fatal(err)
 	}
 	if i == 0 {
-		log.Println((GREEN), "Awesome! You are now running this program with root permissions!", (colorReset))
+		log.Println(GREEN, "Awesome! You are now running this program with root permissions!", colorReset)
 	} else {
-		log.Fatal(string(RED), "[!] This program must be run as root! (sudo)", (colorReset))
+		log.Fatal(RED, "[!] This program must be run as root! (sudo)", colorReset)
 	}
 	return cmd.String()
 }
@@ -93,10 +92,10 @@ func checkForInternet() {
 		log.Fatal(err)
 	}
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
-		log.Println((GREEN), "[+] Internet connection looks good!", (colorReset))
+		log.Println(GREEN, "[+] Internet connection looks good!", colorReset)
 
 	} else {
-		log.Fatal(string(RED), "[-] Internet connection looks down. You will need internet for this to run (most likely). Fix and try again.", (colorReset))
+		log.Fatal(RED, "[-] Internet connection looks down. You will need internet for this to run (most likely). Fix and try again.", colorReset)
 	}
 
 }
@@ -108,9 +107,9 @@ func installKaliRolling() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf((YELLOW), "Waiting for command to finish adding Kali Linux repositories...", (colorReset))
+	log.Printf(YELLOW, "Waiting for command to finish adding Kali Linux repositories...", colorReset)
 	err = cmd.Wait()
-	log.Printf((GREEN), "Kali Linux repositories added with error: %v", (colorReset), err)
+	log.Printf(GREEN, "Kali Linux repositories added with error: %v", colorReset, err)
 	cmd.ProcessState.ExitCode()
 
 	// Download Kali public key for distro use
@@ -119,9 +118,9 @@ func installKaliRolling() {
 	if err2 != nil {
 		log.Fatal(err2)
 	}
-	log.Printf((YELLOW), "Waiting for Public Key to be installed...", (colorReset))
+	log.Printf(YELLOW, "Waiting for Public Key to be installed...", colorReset)
 	err2 = cmd2.Wait()
-	log.Printf((GREEN), "Command finished with error: %v", (colorReset), err2)
+	log.Printf(GREEN, "Command finished with error: %v", colorReset, err2)
 	cmd2.ProcessState.ExitCode()
 
 	// Installing key
@@ -131,7 +130,7 @@ func installKaliRolling() {
 		log.Fatal(err3)
 	}
 	err3 = cmd3.Wait()
-	log.Printf((GREEN), "Adding Key failed: %v", (colorReset), err3)
+	log.Printf(GREEN, "Adding Key failed: %v", colorReset, err3)
 	cmd3.ProcessState.ExitCode()
 
 	//Setting Prefernce Lower to not break current repo
@@ -140,31 +139,40 @@ func installKaliRolling() {
 	if err4 != nil {
 		log.Fatal(err4)
 	}
-	log.Printf((YELLOW), "Waiting for kali.list to be added...", (colorReset))
+	log.Printf(YELLOW, "Waiting for kali.list to be added...", colorReset)
 	err4 = cmd4.Wait()
-	log.Printf((GREEN), "Command finished with error: %v", (colorReset), err4)
+	log.Printf(GREEN, "Command finished with error: %v", colorReset, err4)
 	cmd3.ProcessState.ExitCode()
 }
 
 func updateOS() {
 	//Updating OS
-	log.Printf((YELLOW), "Running Updates")
+	log.Printf(YELLOW, "Running Updates")
 	cmd := exec.Command("apt", "update")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Start()
+	err := cmd.Start()
+	if err != nil {
+		return
+	}
 
 	cmd2 := exec.Command("apt", "upgrade", "-y")
 	cmd2.Stdout = os.Stdout
 	cmd2.Stderr = os.Stderr
-	cmd2.Start()
+	err = cmd2.Start()
+	if err != nil {
+		return
+	}
 
 	cmd3 := exec.Command("apt", "dist-upgrade", "-y")
 	cmd3.Stdout = os.Stdout
 	cmd3.Stderr = os.Stderr
-	cmd3.Start()
+	err = cmd3.Start()
+	if err != nil {
+		return
+	}
 
-	log.Printf((GREEN), "[+] Updates Complete", colorReset)
+	log.Printf(GREEN, "[+] Updates Complete", colorReset)
 }
 
 func installStarterPackages() {
@@ -176,22 +184,25 @@ func installStarterPackages() {
 		"git",
 	}
 
-	slice := (starterPack[2:])
+	slice := starterPack[2:]
 	for _, str := range slice {
 		log.Printf("[*] Attempting installation of the following APT package: %s\n", str)
 	}
 	cmd := exec.Command("apt", starterPack...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Start()
-
-	err := cmd.Wait()
+	err := cmd.Start()
 	if err != nil {
-		log.Fatal(cmd.Stderr, (RED), "[-] APT Updating failed. Fix and try again. Error:", err, (colorReset))
-		os.Exit(1)
+		return
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatal(cmd.Stderr, RED, "[-] APT Updating failed. Fix and try again. Error:", err, colorReset)
+		//os.Exit(1)
 
 	}
-	log.Println((GREEN), "[+] Starter Packages installed.", (colorReset))
+	log.Println(GREEN, "[+] Starter Packages installed.", colorReset)
 }
 func installAptPackages() {
 	aptPackages := []string{
@@ -213,34 +224,37 @@ func installAptPackages() {
 		"whois",
 		"autopsy",
 		"hashcat",
-		"kismet",
+		//"kismet",
 		"kismet-plugins",
 		"airgraph-ng",
 		"wifite",
 		"dnsenum",
 		"dnsmap",
-		"ettercap-common",
-		"ettercap-graphical",
+		//"ettercap-common",
+		//"ettercap-graphical",
 		"netdiscover",
 		"chromium-browser",
 		"python3-pandas",
 	}
-	slice := (aptPackages[2:])
+	slice := aptPackages[2:]
 	for _, str := range slice {
 		log.Printf("[*] Attempting installation of the following APT package: %s\n", str)
 	}
 	cmd := exec.Command("apt", aptPackages...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Start()
-
-	err := cmd.Wait()
+	err := cmd.Start()
 	if err != nil {
-		log.Fatal(cmd.Stderr, (RED), "APT Packages installation failed:", err, colorReset)
-		os.Exit(1)
+		return
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatal(cmd.Stderr, RED, "APT Packages installation failed:", err, colorReset)
+		//os.Exit(1)
 
 	}
-	log.Println((GREEN), "[+] APT Packages installed..", (colorReset))
+	log.Println(GREEN, "[+] APT Packages installed..", colorReset)
 }
 
 func installMSF() {
@@ -248,15 +262,18 @@ func installMSF() {
 	cmd := exec.Command("apt", "install", "-t", "kali-rolling", "-y", "metasploit-framework")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Start()
-
-	err := cmd.Wait()
+	err := cmd.Start()
 	if err != nil {
-		log.Fatal(cmd.Stderr, (RED), "-] MSF installation failed. Error:", err, colorReset)
-		os.Exit(1)
+		return
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatal(cmd.Stderr, RED, "-] MSF installation failed. Error:", err, colorReset)
+		//os.Exit(1)
 
 	}
-	log.Println((GREEN), "[+] MSF Installed Successfully.", (colorReset))
+	log.Println(GREEN, "[+] MSF Installed Successfully.", colorReset)
 }
 
 func installExploitDb() {
@@ -264,15 +281,18 @@ func installExploitDb() {
 	cmd := exec.Command("apt", "install", "-t", "kali-rolling", "-y", "exploitdb")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Start()
-
-	err := cmd.Wait()
+	err := cmd.Start()
 	if err != nil {
-		log.Fatal(cmd.Stderr, (RED), "[-] ExploitDb installation failed. Error:", err, colorReset)
-		os.Exit(1)
+		return
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatal(cmd.Stderr, RED, "[-] ExploitDb installation failed. Error:", err, colorReset)
+		//os.Exit(1)
 
 	}
-	log.Println((GREEN), "[+] ExploitDb Installed Successfully.", (colorReset))
+	log.Println(GREEN, "[+] ExploitDb Installed Successfully.", colorReset)
 }
 
 func installOtherKaliTools() {
@@ -313,7 +333,6 @@ func installOtherKaliTools() {
 		"sherlock",
 		"maltego",
 		"python3-shodan",
-		"theharvester",
 		"webhttrack",
 		"outguess",
 		"stegosuite",
@@ -329,21 +348,24 @@ func installOtherKaliTools() {
 		"drawing",
 		"finalrecon",
 	}
-	slice := (kaliRepoTools[4:])
+	slice := kaliRepoTools[4:]
 	for _, str := range slice {
 		log.Printf("[*] Attempting installation of the following package from the Kali-Rolling Repo: %s\n", str)
 	}
 	cmd := exec.Command("apt", kaliRepoTools...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Start()
-
-	err := cmd.Wait()
+	err := cmd.Start()
 	if err != nil {
-		log.Fatal(cmd.Stderr, (RED), "[-] Installation failed. Error:", err, colorReset)
-		os.Exit(1)
+		return
 	}
-	log.Println((GREEN), "[+] Kali repo tools installed Successfully.", (colorReset))
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatal(cmd.Stderr, RED, "[-] Installation failed. Error:", err, colorReset)
+		//os.Exit(1)
+	}
+	log.Println(GREEN, "[+] Kali repo tools installed Successfully.", colorReset)
 }
 
 func installWordlists() {
@@ -351,15 +373,18 @@ func installWordlists() {
 	cmd := exec.Command("apt", "install", "-t", "kali-rolling", "-y", "wordlists", "seclists")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Start()
-
-	err := cmd.Wait()
+	err := cmd.Start()
 	if err != nil {
-		log.Fatal(cmd.Stderr, (RED), "[-] Installation failed. Error:", err, colorReset)
-		os.Exit(1)
+		return
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		log.Fatal(cmd.Stderr, RED, "[-] Installation failed. Error:", err, colorReset)
+		//os.Exit(1)
 
 	}
-	log.Println((GREEN), "[+] Wordlists installed Successfully.", (colorReset))
+	log.Println(GREEN, "[+] Wordlists installed Successfully.", colorReset)
 }
 
 func main() {
