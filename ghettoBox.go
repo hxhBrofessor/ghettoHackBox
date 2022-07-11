@@ -225,7 +225,7 @@ func installAptPackages() {
 		"autopsy",
 		"hashcat",
 		//"kismet",
-		"kismet-plugins",
+		//"kismet-plugins",
 		"airgraph-ng",
 		"wifite",
 		"dnsenum",
